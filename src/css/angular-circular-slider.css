@@ -1,0 +1,62 @@
+/*! The MIT License (MIT)
+
+Copyright (c) 2014 Prince John Wesley <princejohnwesley@gmail.com>
+**/
+
+.acs-panel {
+  position: relative;
+  display: inline-block;
+  border-style: solid;
+  border-color: transparent;
+  cursor: pointer;
+}
+
+.acs {
+  position: relative;
+  border-style: solid;
+  border-radius: 100%;
+  border-color: hotpink;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-width: 5px;
+  cursor: pointer;
+}
+
+.acs-value {
+  position: absolute;
+  border-style: none;
+  border-radius: 100%;
+  border: 2px solid rgb(236, 248, 212);
+  text-align: center;
+  pointer-events: none;
+  line-height: 4em;
+  color: white;
+  background-color: yellowgreen;
+  outline: none;
+}
+
+.acs-indicator {
+  position: absolute;
+  border-radius: 100%;
+  background-color: deeppink;
+  border: 1px solid rgb(177, 177, 177);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.acs-value * {
+  border-radius: 100%;
+  background: transparent;
+  width: inherit;
+  height: inherit;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
