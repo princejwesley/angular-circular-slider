@@ -24,17 +24,21 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
   function $$(elem) {
     // only one element
     var dom = elem[0];
+    var computedStyle = window.getComputedStyle(dom, null);
 
     function getCss(prop) {
-      return function(param) {
-        if (param) elem.css(prop, param);
-        return param ? param : elem.css(prop);
+      return function() {
+        return computedStyle[prop];
       };
+    }
+
+    function props(p) {
+      return dom[p];
     }
 
     function getProps(prop) {
       return function() {
-        return dom[prop];
+        return props(prop);
       };
     }
 
@@ -68,6 +72,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
+
     function position() {
       var p = $$(offsetParent());
       var po = p.offset();
@@ -84,6 +89,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
     return {
       css: elem.css,
+      prop: props,
       width: applyFloatFn(getCss('width')),
       height: applyFloatFn(getCss('height')),
       // outer area + margin
@@ -171,11 +177,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'font-size': iRadius / 2 + "px",
         });
 
-        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
-        var corner = radius - iRadius - outerArea * 2;
+        var corner = radius - iRadius;
         acsValue.css({
-          'top': corner + "px",
-          'left': corner + "px",
+          'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
+          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -240,11 +245,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'font-size': iRadius / 2 + "px",
         });
 
-        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
-        var corner = radius - iRadius - outerArea * 2;
+        var corner = radius - iRadius;
         acsValue.css({
-          'top': corner + "px",
-          'left': corner + "px",
+          'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
+          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -308,11 +312,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'font-size': iRadius / 2 + "px",
         });
 
-        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
-        var corner = radius - iRadius - outerArea * 2;
+        var corner = radius - iRadius;
         acsValue.css({
-          'top': corner + "px",
-          'left': corner + "px",
+          'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
+          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -377,11 +380,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'font-size': iRadius / 2 + "px",
         });
 
-        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
-        var corner = radius - iRadius - outerArea * 2;
+        var corner = radius - iRadius;
         acsValue.css({
-          'top': corner + "px",
-          'left': -corner + "px",
+          'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
+          'right':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -445,11 +447,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'font-size': iRadius / 2 + "px",
         });
 
-        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
-        var corner = radius - iRadius - outerArea * 2;
+        var corner = radius - iRadius;
         acsValue.css({
-          'top': -corner + "px",
-          'left': corner + "px",
+          'bottom': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
+          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -523,6 +524,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     controller.validateBindings();
 
     // building components
+    element.addClass('acs-slider');
     redrawShape();
 
     // wiring events
@@ -543,8 +545,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var $$acs = $$(component.acs);
       var $$acsIndicator = $$(component.acsIndicator);
       cs.acsPosition = $$acs.position();
-      cs.acsOuterArea = $$acs.outerWidth() - $$acs.innerWidth();
-      cs.acsBallOuterArea = $$acsIndicator.outerWidth() - $$acsIndicator.innerWidth();
+      cs.acsOuterArea = $$acs.outerWidth() - $$acs.width();
+      cs.acsBallOuterArea = $$acsIndicator.outerWidth() - $$acsIndicator.width();
   
       cs.acsRadius = ($$acs.width() + cs.acsOuterArea) / 2;
       cs.acsBallRadius = ($$acsIndicator.width() + cs.acsBallOuterArea) / 2;
@@ -562,8 +564,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var rad = d360 * Math.PI / 180;
       var components = getComponents();
 
-      var x = cs.acsCenter.x + cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad) - cs.acsBallRadius;
-      var y = cs.acsCenter.y + cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad) - cs.acsBallRadius;
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - cs.acsBallRadius;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - 2 * cs.acsBallRadius;
       
       components.acsIndicator.css('top', y + "px");
       components.acsIndicator.css('left', x + "px");

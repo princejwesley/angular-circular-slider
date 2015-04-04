@@ -3,6 +3,15 @@
 Copyright (c) 2014 Prince John Wesley <princejohnwesley@gmail.com>
 **/
 
+.acs-slider {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
 .acs-panel {
   position: relative;
   display: inline-block;
