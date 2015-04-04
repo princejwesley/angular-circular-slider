@@ -32,12 +32,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
-    function getStyle(prop) {
-      return function() {
-        return dom.style[prop];
-      };
-    }
-
     function getProps(prop) {
       return function() {
         return dom[prop];
@@ -60,18 +54,50 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
+    function offsetParent() {
+      return angular.element(dom.offsetParent);
+    }
+
+    function offset() {
+      var box = dom.getBoundingClientRect();
+      var docElem = dom.ownerDocument.documentElement;
+
+      return {
+        top: box.top + docElem.scrollTop - docElem.clientTop,
+        left: box.left + docElem.scrollLeft - docElem.clientLeft
+      };
+    }
+
+    function position() {
+      var p = $$(offsetParent());
+      var po = p.offset();
+      var box = offset();
+
+      po.top += parseToFloat(p.css('borderTopWidth'));
+      po.left += parseToFloat(p.css('borderLeftWidth')); 
+
+      return {
+        top: box.top - po.top - parseToFloat(elem.css('marginTop')),
+        left: box.left - po.left - parseToFloat(elem.css('marginLeft')),
+      };
+    }
+
     return {
+      css: elem.css,
       width: applyFloatFn(getCss('width')),
       height: applyFloatFn(getCss('height')),
       // outer area + margin
-      outerWidth: addFloats(addFloats(getProps('offsetWidth'), getStyle('marginLeft')),
-        getStyle('marginRight')),
-      outerHeight: addFloats(addFloats(getProps('offsetHeight'), getStyle('marginTop')),
-        getStyle('marginBottom')),
-      innerWidth: addFloats(addFloats(getCss('width'), getStyle('paddingLeft')),
-        getStyle('paddingRight')),
-      innerHeight: addFloats(addFloats(getCss('height'), getStyle('paddingTop')),
-        getStyle('paddingBottom')),
+      outerWidth: addFloats(addFloats(getProps('offsetWidth'), getCss('marginLeft')),
+        getCss('marginRight')),
+      outerHeight: addFloats(addFloats(getProps('offsetHeight'), getCss('marginTop')),
+        getCss('marginBottom')),
+      innerWidth: addFloats(addFloats(getCss('width'), getCss('paddingLeft')),
+        getCss('paddingRight')),
+      innerHeight: addFloats(addFloats(getCss('height'), getCss('paddingTop')),
+        getCss('paddingBottom')),
+      offset: offset,
+      offsetParent: offsetParent,
+      position: position,
     };
   }
 
@@ -86,6 +112,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       value: 0,
       radius: 75,
       innerCircleRatio: '0.5',
+      borderRatio: '0.1',
       clockwise: true,
       shape: "Circle",
       touch: true,
@@ -124,10 +151,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'border-radius': rpx
         });
 
-        var pd = d + (radius / 10);
+        var w = radius * scope.borderRatio;
+        var pd = d + w;
 
         acsPanel.css({
-          'border-width': (radius / 10) + 'px',
+          'border-width': w + 'px',
           'border-radius': pd + 'px',
         });
 
@@ -187,10 +215,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'border-bottom': 'none'
         });
 
-        var pd = d + (radius / 10);
+        var w = radius * scope.borderRatio;
+        var pd = d + w;
 
         acsPanel.css({
-          'border-width': (radius / 10) + 'px',
+          'border-width': w + 'px',
           'border-radius': pd + "px " + pd + "px 0 0",
           'border-bottom': 'none'
         });
@@ -250,10 +279,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'border-right': 'none'
         });
 
-        var pd = d + (radius / 10);
+        var w = radius * scope.borderRatio;
+        var pd = d + w;
 
         acsPanel.css({
-          'border-width': (radius / 10) + 'px',
+          'border-width': w + 'px',
           'border-radius': pd + "px 0 0" + pd + "px",
           'border-right': 'none'
         });
@@ -314,10 +344,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'border-left': 'none'
         });
 
-        var pd = d + (radius / 10);
+        var w = radius * scope.borderRatio;
+        var pd = d + w;
 
         acsPanel.css({
-          'border-width': (radius / 10) + 'px',
+          'border-width': w + 'px',
           'border-radius': "0 " + pd + "px" + pd + "px 0",
           'border-left': 'none'
         });
@@ -377,10 +408,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'border-top': 'none'
         });
 
-        var pd = d + (radius / 10);
+        var w = radius * scope.borderRatio;
+        var pd = d + w;
 
         acsPanel.css({
-          'border-width': (radius / 10) + 'px',
+          'border-width': w + 'px',
           'border-radius': "0 0 " + pd + "px " + pd + "px",
           'border-top': 'none'
         });
@@ -442,6 +474,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         value: '=?',
         radius: '@',
         innerCircleRatio: '@',
+        borderRatio: '@',
         clockwise: '@',
         shape: '@',
         touch: '@',
@@ -514,7 +547,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         transform: parseInt
       },
       number: {
-        bindings: ['innerCircleRatio'],
+        bindings: ['innerCircleRatio', 'borderRatio'],
         transform: parseFloat,
       },
       'function': {
@@ -533,7 +566,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onError: typeErrorMsg('integer')
         },
         number: {
-          bindings: ['innerCircleRatio'],
+          bindings: ['innerCircleRatio', 'borderRatio'],
           test: Number.isFinite,
           onError: typeErrorMsg('number')
         },
@@ -584,6 +617,15 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           },
           onError: function() {
             return ['innerCircleRatio(', $scope.innerCircleRatio, ') is out of range: [0,1]'].join('');
+          },
+        },
+        borderRatio: {
+          bindings: ['borderRatio'],
+          test: function borderRatio() {
+            return $scope.borderRatio >= 0.01 && $scope.borderRatio <= 0.5;
+          },
+          onError: function() {
+            return ['borderRatio(', $scope.borderRatio, ') is out of range: [0.01,0.5]'].join('');
           },
         }
       }
