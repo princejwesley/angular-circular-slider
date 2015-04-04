@@ -152,14 +152,15 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
+        var w = radius * scope.borderRatio;
 
         acs.css({
           'width': rpx,
           'height': rpx,
-          'border-radius': rpx
+          'border-radius': rpx,
+          'border-width': w + 'px',
         });
 
-        var w = radius * scope.borderRatio;
         var pd = d + w;
 
         acsPanel.css({
@@ -217,16 +218,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-
+        var w = radius * scope.borderRatio;
 
         acs.css({
           'width': d + "px",
           'height': radius + "px",
           'border-radius': d + "px " + d + "px 0 0",
-          'border-bottom': 'none'
+          'border-bottom': 'none',
+          'border-width': w + 'px',
         });
 
-        var w = radius * scope.borderRatio;
         var pd = d + w;
 
         acsPanel.css({
@@ -285,15 +286,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
+        var w = radius * scope.borderRatio;
 
         acs.css({
           'height': d + "px",
           'width': radius + "px",
           'border-radius': d + "px 0 0 " + d + "px",
-          'border-right': 'none'
+          'border-right': 'none',
+          'border-width': w + 'px',
         });
 
-        var w = radius * scope.borderRatio;
         var pd = d + w;
 
         acsPanel.css({
@@ -353,15 +355,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
+        var w = radius * scope.borderRatio;
 
         acs.css({
           'height': d + "px",
           'width': radius + "px",
           'border-radius': "0 " + d + "px " + d + "px 0",
-          'border-left': 'none'
+          'border-left': 'none',
+          'border-width': w + 'px',
         });
 
-        var w = radius * scope.borderRatio;
         var pd = d + w;
 
         acsPanel.css({
@@ -420,15 +423,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
+        var w = radius * scope.borderRatio;
 
         acs.css({
           'width': d + "px",
           'height': radius + "px",
           'border-radius': "0 0 " + d + "px " + d + "px",
-          'border-top': 'none'
+          'border-top': 'none',
+          'border-width': w + 'px',
         });
 
-        var w = radius * scope.borderRatio;
         var pd = d + w;
 
         acsPanel.css({
