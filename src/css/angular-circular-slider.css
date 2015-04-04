@@ -48,8 +48,6 @@ Copyright (c) 2014 Prince John Wesley <princejohnwesley@gmail.com>
 .acs-value * {
   border-radius: 100%;
   background: transparent;
-  width: inherit;
-  height: inherit;
 }
 
 .noselect {

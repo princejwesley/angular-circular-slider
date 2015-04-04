@@ -20,6 +20,63 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     };
   }
 
+  // elem is jqLite
+  function $$(elem) {
+    // only one element
+    var dom = elem[0];
+
+    function getCss(prop) {
+      return function(param) {
+        if (param) elem.css(prop, param);
+        return param ? param : elem.css(prop);
+      };
+    }
+
+    function getStyle(prop) {
+      return function() {
+        return dom.style[prop];
+      };
+    }
+
+    function getProps(prop) {
+      return function() {
+        return dom[prop];
+      };
+    }
+
+    function parseToFloat(value) {
+      return parseFloat(value) || 0.0;
+    }
+
+    function addFloats(left, right) {
+      return function() {
+        return parseToFloat(left()) + parseToFloat(right());
+      }
+    }
+
+    function applyFloatFn(fn) {
+      return function(param) {
+        return parseToFloat(fn(param));
+      };
+    }
+
+    return {
+      width: applyFloatFn(getCss('width')),
+      height: applyFloatFn(getCss('height')),
+      // outer area + margin
+      outerWidth: addFloats(addFloats(getProps('offsetWidth'), getStyle('marginLeft')),
+        getStyle('marginRight')),
+      outerHeight: addFloats(addFloats(getProps('offsetHeight'), getStyle('marginTop')),
+        getStyle('marginBottom')),
+      innerWidth: addFloats(addFloats(getCss('width'), getStyle('paddingLeft')),
+        getStyle('paddingRight')),
+      innerHeight: addFloats(addFloats(getCss('height'), getStyle('paddingTop')),
+        getStyle('paddingBottom')),
+    };
+  }
+
+
+  var cs = {};
 
   var props = {
 
@@ -40,16 +97,337 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     },
 
     template: '\
-			<div class="acs-panel">\
-				<div class="acs">\
-					<div clas="acs-value" ng-transclude>\
-					</div>\
-				</div>\
-				<div class="acs-indicator">\
-				</div>\
-			</div>\
-		',
+      <div class="acs-panel">\
+        <div class="acs">\
+          <div class="acs-value" ng-transclude>\
+          </div>\
+        </div>\
+        <div class="acs-indicator">\
+        </div>\
+      </div>\
+    ',
   };
+
+  var shapes = {
+    "Circle": {
+      drawShape: function(acsComponents, radius) {
+        var d = radius * 2;
+        var rpx = d + "px";
+        var acs = acsComponents.acs;
+        var acsValue = acsComponents.acsValue;
+        var acsPanel = acsComponents.acsPanel;
+        var scope = acsComponents.scope;
+
+        acs.css({
+          'width': rpx,
+          'height': rpx,
+          'border-radius': rpx
+        });
+
+        var pd = d + (radius / 10);
+
+        acsPanel.css({
+          'border-width': (radius / 10) + 'px',
+          'border-radius': pd + 'px',
+        });
+
+        var $$acs = $$(acs);
+        var $$acsValue = $$(acsValue);
+        var iRadius = scope.innerCircleRatio * radius;
+
+        acsValue.css({
+          'width': (iRadius * 2) + "px",
+          'height': (iRadius * 2) + "px",
+          'font-size': iRadius / 2 + "px",
+        });
+
+        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
+        var corner = radius - iRadius - outerArea * 2;
+        acsValue.css({
+          'top': corner + "px",
+          'left': corner + "px",
+        });
+      },
+      getCenter: function(acsPosition, acsRadius) {
+        return {
+          x: acsPosition.left + acsRadius,
+          y: acsPosition.top + acsRadius,
+          r: acsRadius
+        };
+      },
+      deg2Val: function(deg) {
+        if (deg < 0 || deg > 359)
+          throw "Invalid angle " + deg;
+
+        deg = (deg + 90) % 360;
+        return Math.round(deg * (range / 360.0)) + scope.min;
+      },
+      val2Deg: function(value) {
+        if (value < scope.min || value > scope.max)
+          throw "Invalid range " + value;
+
+        var nth = value - scope.min;
+
+        return (Math.round(nth * (360.0 / range)) - 90) % 360;
+      },
+    },
+    "Half Circle": {
+      drawShape: function(acsComponents, radius) {
+        var d = radius * 2;
+        var acs = acsComponents.acs;
+        var acsValue = acsComponents.acsValue;
+        var acsPanel = acsComponents.acsPanel;
+        var scope = acsComponents.scope;
+
+
+        acs.css({
+          'width': d + "px",
+          'height': radius + "px",
+          'border-radius': d + "px " + d + "px 0 0",
+          'border-bottom': 'none'
+        });
+
+        var pd = d + (radius / 10);
+
+        acsPanel.css({
+          'border-width': (radius / 10) + 'px',
+          'border-radius': pd + "px " + pd + "px 0 0",
+          'border-bottom': 'none'
+        });
+
+        var $$acs = $$(acs);
+        var $$acsValue = $$(acsValue);
+        var iRadius = scope.innerCircleRatio * radius;
+
+        acsValue.css({
+          'width': (iRadius * 2) + "px",
+          'height': (iRadius * 2) + "px",
+          'font-size': iRadius / 2 + "px",
+        });
+
+        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
+        var corner = radius - iRadius - outerArea * 2;
+        acsValue.css({
+          'top': corner + "px",
+          'left': corner + "px",
+        });
+      },
+      getCenter: function(acsPosition, acsRadius) {
+        return {
+          x: acsPosition.left + acsRadius,
+          y: acsPosition.top + acsRadius,
+          r: acsRadius
+        };
+      },
+      deg2Val: function(deg) {
+        if (deg < 0 || deg > 359)
+          throw "Invalid angle " + deg;
+
+        deg = (deg + 180) % 360;
+        return Math.round(deg * (range / 180.0)) + scope.min;
+      },
+      val2Deg: function(value) {
+        if (value < scope.min || value > scope.max)
+          throw "Invalid range " + value;
+
+        var nth = value - scope.min;
+
+        return (Math.round(nth * (180.0 / range)) - 180) % 360;
+      },
+    },
+    "Half Circle Left": {
+      drawShape: function(acsComponents, radius) {
+        var d = radius * 2;
+        var acs = acsComponents.acs;
+        var acsValue = acsComponents.acsValue;
+        var acsPanel = acsComponents.acsPanel;
+        var scope = acsComponents.scope;
+
+        acs.css({
+          'height': d + "px",
+          'width': radius + "px",
+          'border-radius': d + "px 0 0 " + d + "px",
+          'border-right': 'none'
+        });
+
+        var pd = d + (radius / 10);
+
+        acsPanel.css({
+          'border-width': (radius / 10) + 'px',
+          'border-radius': pd + "px 0 0" + pd + "px",
+          'border-right': 'none'
+        });
+
+        var $$acs = $$(acs);
+        var $$acsValue = $$(acsValue);
+        var iRadius = scope.innerCircleRatio * radius;
+
+        acsValue.css({
+          'width': (iRadius * 2) + "px",
+          'height': (iRadius * 2) + "px",
+          'font-size': iRadius / 2 + "px",
+        });
+
+        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
+        var corner = radius - iRadius - outerArea * 2;
+        acsValue.css({
+          'top': corner + "px",
+          'left': corner + "px",
+        });
+      },
+      getCenter: function(acsPosition, acsRadius) {
+        return {
+          x: acsPosition.left + acsRadius * 2,
+          y: acsPosition.top + acsRadius * 2,
+          r: acsRadius * 2
+        };
+      },
+      deg2Val: function(deg) {
+        if (deg < 0 || deg > 359)
+          throw "Invalid angle " + deg;
+
+        deg = (deg - 90) % 360;
+        return Math.round(deg * (range / 180.0)) + scope.min;
+      },
+      val2Deg: function(value) {
+        if (value < scope.min || value > scope.max)
+          throw "Invalid range " + value;
+
+        var nth = value - scope.min;
+
+        return (Math.round(nth * (180.0 / range)) + 90) % 360;
+      },
+    },
+
+    "Half Circle Right": {
+      drawShape: function(acsComponents, radius) {
+        var d = radius * 2;
+        var acs = acsComponents.acs;
+        var acsValue = acsComponents.acsValue;
+        var acsPanel = acsComponents.acsPanel;
+        var scope = acsComponents.scope;
+
+        acs.css({
+          'height': d + "px",
+          'width': radius + "px",
+          'border-radius': "0 " + d + "px " + d + "px 0",
+          'border-left': 'none'
+        });
+
+        var pd = d + (radius / 10);
+
+        acsPanel.css({
+          'border-width': (radius / 10) + 'px',
+          'border-radius': "0 " + pd + "px" + pd + "px 0",
+          'border-left': 'none'
+        });
+
+        var $$acs = $$(acs);
+        var $$acsValue = $$(acsValue);
+        var iRadius = scope.innerCircleRatio * radius;
+
+        acsValue.css({
+          'width': (iRadius * 2) + "px",
+          'height': (iRadius * 2) + "px",
+          'font-size': iRadius / 2 + "px",
+        });
+
+        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
+        var corner = radius - iRadius - outerArea * 2;
+        acsValue.css({
+          'top': corner + "px",
+          'left': -corner + "px",
+        });
+      },
+      getCenter: function(acsPosition, acsRadius) {
+        return {
+          x: acsPosition.left,
+          y: acsPosition.top + acsRadius * 2,
+          r: acsRadius * 2
+        };
+      },
+      deg2Val: function(deg) {
+        if (deg < 0 || deg > 359)
+          throw "Invalid angle " + deg;
+
+        deg = (deg + 90) % 360;
+        return Math.round(deg * (range / 180.0)) + scope.min;
+      },
+      val2Deg: function(value) {
+        if (value < scope.min || value > scope.max)
+          throw "Invalid range " + value;
+
+        var nth = value - scope.min;
+
+        return (Math.round(nth * (180.0 / range)) - 90) % 360;
+      },
+    },
+    "Half Circle Bottom": {
+      drawShape: function(acsComponents, radius) {
+        var d = radius * 2;
+        var acs = acsComponents.acs;
+        var acsValue = acsComponents.acsValue;
+        var acsPanel = acsComponents.acsPanel;
+        var scope = acsComponents.scope;
+
+        acs.css({
+          'width': d + "px",
+          'height': radius + "px",
+          'border-radius': "0 0 " + d + "px " + d + "px",
+          'border-top': 'none'
+        });
+
+        var pd = d + (radius / 10);
+
+        acsPanel.css({
+          'border-width': (radius / 10) + 'px',
+          'border-radius': "0 0 " + pd + "px " + pd + "px",
+          'border-top': 'none'
+        });
+
+        var $$acs = $$(acs);
+        var $$acsValue = $$(acsValue);
+        var iRadius = scope.innerCircleRatio * radius;
+
+        acsValue.css({
+          'width': (iRadius * 2) + "px",
+          'height': (iRadius * 2) + "px",
+          'font-size': iRadius / 2 + "px",
+        });
+
+        var outerArea = ($$acs.outerWidth() - $$acs.innerWidth()) + ($$acsValue.outerWidth() - $$acsValue.innerWidth());
+        var corner = radius - iRadius - outerArea * 2;
+        acsValue.css({
+          'top': -corner + "px",
+          'left': corner + "px",
+        });
+      },
+      getCenter: function(acsPosition, acsRadius) {
+        return {
+          x: acsPosition.left + acsRadius,
+          y: acsPosition.top,
+          r: acsRadius
+        };
+      },
+      deg2Val: function(deg) {
+        if (deg < 0 || deg > 359)
+          throw "Invalid angle " + deg;
+
+        return Math.round(deg * (range / 180.0)) + scope.min;
+      },
+      val2Deg: function(value) {
+        if (value < scope.min || value > scope.max)
+          throw "Invalid range " + value;
+
+        var nth = value - scope.min;
+
+        return Math.round(nth * (180.0 / range));
+      },
+    }
+  };
+
+
+
 
   function circularSlider() {
     return {
@@ -83,8 +461,40 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       }
     });
 
+    // validations
     controller.validateBindings();
 
+    // building components
+    shapes[scope.shape].drawShape(getComponents(), getRadius());
+
+    // wiring events
+
+
+    // private functions
+    function getComponents() {
+      return cs.components ? cs.components : buildComponents();
+
+      function buildComponents() {
+        var acsPanel = element.children();
+        var acsPanelChildren = acsPanel.children();
+        var acs = angular.element(acsPanelChildren[0]);
+        var acsIndicator = angular.element(acsPanelChildren[1]);
+        var acsValue = acs.children();
+
+        var acsComponents = {
+          'acsPanel': acsPanel,
+          'acs': acs,
+          'acsIndicator': acsIndicator,
+          'acsValue': acsValue,
+          'scope': scope
+        };
+        return (cs.components = acsComponents);
+      }
+    }
+
+    function getRadius() {
+      return Math.abs(parseInt(scope.radius)) || props.defaults.radius;
+    }
   }
 
 
@@ -232,7 +642,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
   CircularSliderController.$inject = ['$scope', '$attrs'];
 
-  angular.module('toolitup.circular-slider', [])
+  angular.module('angular.circular-slider', [])
     .directive('circularSlider', circularSlider);
 
 }(window, window.angular));
