@@ -11,7 +11,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
   }
 
   function toBoolean(o) {
-    return (o && o === 'true');
+    return (typeof o === 'boolean') || o === 'true';
   }
 
   function and(left, right) {
@@ -113,6 +113,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       radius: 75,
       innerCircleRatio: '0.5',
       borderRatio: '0.1',
+      indicatorBallRatio: '0.2',
+      handleDistRatio: '1.0',
       clockwise: true,
       shape: "Circle",
       touch: true,
@@ -184,6 +186,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         };
       },
       deg2Val: function(deg) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (deg < 0 || deg > 359)
           throw "Invalid angle " + deg;
 
@@ -191,6 +195,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         return Math.round(deg * (range / 360.0)) + scope.min;
       },
       val2Deg: function(value) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (value < scope.min || value > scope.max)
           throw "Invalid range " + value;
 
@@ -249,6 +255,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         };
       },
       deg2Val: function(deg) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (deg < 0 || deg > 359)
           throw "Invalid angle " + deg;
 
@@ -256,6 +264,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         return Math.round(deg * (range / 180.0)) + scope.min;
       },
       val2Deg: function(value) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (value < scope.min || value > scope.max)
           throw "Invalid range " + value;
 
@@ -313,6 +323,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         };
       },
       deg2Val: function(deg) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (deg < 0 || deg > 359)
           throw "Invalid angle " + deg;
 
@@ -320,6 +332,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         return Math.round(deg * (range / 180.0)) + scope.min;
       },
       val2Deg: function(value) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (value < scope.min || value > scope.max)
           throw "Invalid range " + value;
 
@@ -378,6 +392,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         };
       },
       deg2Val: function(deg) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (deg < 0 || deg > 359)
           throw "Invalid angle " + deg;
 
@@ -385,6 +401,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         return Math.round(deg * (range / 180.0)) + scope.min;
       },
       val2Deg: function(value) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (value < scope.min || value > scope.max)
           throw "Invalid range " + value;
 
@@ -442,12 +460,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         };
       },
       deg2Val: function(deg) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (deg < 0 || deg > 359)
           throw "Invalid angle " + deg;
 
         return Math.round(deg * (range / 180.0)) + scope.min;
       },
       val2Deg: function(value) {
+        var scope = cs.components.scope;
+        var range = scope.max - scope.min + 1;
         if (value < scope.min || value > scope.max)
           throw "Invalid range " + value;
 
@@ -469,11 +491,14 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       controller: CircularSliderController,
       controllerAs: 'slider',
       scope: {
+        csSlider: '=?',
         min: '@',
         max: '@',
         value: '=?',
         radius: '@',
         innerCircleRatio: '@',
+        indicatorBallRatio: '@',
+        handleDistRatio: '@',
         borderRatio: '@',
         clockwise: '@',
         shape: '@',
@@ -498,12 +523,62 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     controller.validateBindings();
 
     // building components
-    shapes[scope.shape].drawShape(getComponents(), getRadius());
+    redrawShape();
 
     // wiring events
 
+    // bind slider in scope
+    scope.csSlider = {
+      'setValue' : setValue,
+    };
 
     // private functions
+
+    function redrawShape() {
+      var component = getComponents();
+      var radius = getRadius();
+      shapes[scope.shape].drawShape(component, radius);
+      drawIndicatorBall(component, radius);
+
+      var $$acs = $$(component.acs);
+      var $$acsIndicator = $$(component.acsIndicator);
+      cs.acsPosition = $$acs.position();
+      cs.acsOuterArea = $$acs.outerWidth() - $$acs.innerWidth();
+      cs.acsBallOuterArea = $$acsIndicator.outerWidth() - $$acsIndicator.innerWidth();
+  
+      cs.acsRadius = ($$acs.width() + cs.acsOuterArea) / 2;
+      cs.acsBallRadius = ($$acsIndicator.width() + cs.acsBallOuterArea) / 2;
+      cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
+
+      setValue(scope.value || scope.min);
+
+    }
+
+    function setValue(value) {
+      controller.validateBinding('value');
+
+      var val = scope.clockwise ? value : (scope.max - value);
+      var d360 = shapes[scope.shape].val2Deg(val);
+      var rad = d360 * Math.PI / 180;
+      var components = getComponents();
+
+      var x = cs.acsCenter.x + cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad) - cs.acsBallRadius;
+      var y = cs.acsCenter.y + cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad) - cs.acsBallRadius;
+      
+      components.acsIndicator.css('top', y + "px");
+      components.acsIndicator.css('left', x + "px");
+      
+      scope.value = value;
+      scope.onSlide(value);
+    }
+
+    function drawIndicatorBall(component, radius) {
+      component.acsIndicator.css({
+        'width': (radius * scope.indicatorBallRatio) + "px",
+        'height': (radius * scope.indicatorBallRatio) + "px",
+      });
+    };
+
     function getComponents() {
       return cs.components ? cs.components : buildComponents();
 
@@ -519,7 +594,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           'acs': acs,
           'acsIndicator': acsIndicator,
           'acsValue': acsValue,
-          'scope': scope
+          'scope': scope,
+          'ctrl': controller,
         };
         return (cs.components = acsComponents);
       }
@@ -531,7 +607,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
   }
 
 
-  function CircularSliderController($scope, $attrs) {
+  function CircularSliderController($scope) {
 
     function typeErrorMsg(typeName) {
       return function(binding, value) {
@@ -539,7 +615,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
-    var shapes = ['Circle', 'Half Circle', 'Half Circle Left', 'Half Circle Right'];
+    var shapes = ['Circle', 'Half Circle', 'Half Circle Left', 'Half Circle Right', 'Half Circle Bottom'];
 
     var transforms = {
       integer: {
@@ -547,7 +623,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         transform: parseInt
       },
       number: {
-        bindings: ['innerCircleRatio', 'borderRatio'],
+        bindings: ['innerCircleRatio', 'borderRatio', 'indicatorBallRatio', 'handleDistRatio'],
         transform: parseFloat,
       },
       'function': {
@@ -566,7 +642,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onError: typeErrorMsg('integer')
         },
         number: {
-          bindings: ['innerCircleRatio', 'borderRatio'],
+          bindings: ['innerCircleRatio', 'borderRatio', 'indicatorBallRatio', 'handleDistRatio'],
           test: Number.isFinite,
           onError: typeErrorMsg('number')
         },
@@ -594,7 +670,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         },
         value: {
           bindings: ['value'],
-          test: function valueInRange() {
+          test: function valueInRange(value) {
             return $scope.min <= value && value <= $scope.max;
           },
           onError: function() {
@@ -604,36 +680,27 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         shape: {
           bindings: ['shape'],
           test: function shapeSupported() {
-            return this.shapes[$scope.shape];
+            return shapes.indexOf($scope.shape) !== -1;
           },
           onError: function() {
             return ['Unsupported shape: ', $scope.shape].join('');
           },
         },
         ratio: {
-          bindings: ['innerCircleRatio'],
-          test: function ratio() {
-            return $scope.innerCircleRatio >= 0.0 && $scope.innerCircleRatio <= 1.0;
+          bindings: ['innerCircleRatio', 'handleDistRatio', 'borderRatio', 'indicatorBallRatio'],
+          test: function ratio(value) {
+            return value >= 0.0 && value <= 1.0;
           },
-          onError: function() {
-            return ['innerCircleRatio(', $scope.innerCircleRatio, ') is out of range: [0,1]'].join('');
+          onError: function(b, value) {
+            return [b + '(', value, ') is out of range: [0,1]'].join('');
           },
         },
-        borderRatio: {
-          bindings: ['borderRatio'],
-          test: function borderRatio() {
-            return $scope.borderRatio >= 0.01 && $scope.borderRatio <= 0.5;
-          },
-          onError: function() {
-            return ['borderRatio(', $scope.borderRatio, ') is out of range: [0.01,0.5]'].join('');
-          },
-        }
       }
     };
 
 
-    this.validateBindings = function() {
-      var props = this.props,
+    this.validateBindings = function(property) {
+      var props = property ? property : this.props,
         p, binding;
 
       for (p in props) {
@@ -650,6 +717,12 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       }
     };
 
+    this.validateBinding = function(binding) {
+      if(angular.isUndefined(binding)) return;
+      var property = {};
+      property[binding] = this.props[binding];
+      this.validateBindings(property);
+    };
 
     function init(controller) {
 
@@ -661,10 +734,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
             controller[binding] = controller[binding] || {
               tests: []
             };
-            controller[binding].tests.push[{
+            controller[binding].tests.push({
               test: action.test,
               onError: action.onError
-            }];
+            });
           });
         });
       });
@@ -682,7 +755,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
   }
 
 
-  CircularSliderController.$inject = ['$scope', '$attrs'];
+  CircularSliderController.$inject = ['$scope'];
 
   angular.module('angular.circular-slider', [])
     .directive('circularSlider', circularSlider);
