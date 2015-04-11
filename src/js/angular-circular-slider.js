@@ -10,8 +10,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     return (o | 0) === o;
   }
 
-  function toBoolean(o) {
-    return (typeof o === 'boolean') || o === 'true';
+  function truthy() {
+    return true;
   }
 
   function and(left, right) {
@@ -484,6 +484,56 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     }
   };
 
+  var eventHandlers = (function(){
+    var lastTouchType = '';
+    function touchHandler(e) {
+      var touches = e.changedTouches;
+
+      // Ignore multi-touch
+      if (touches.length > 1) return;
+
+      var touch = touches[0];
+      var target = $(touch.target);
+
+      if(!target.hasClass('jcs')) return;
+
+      var offset = target.offset();
+      var width = target.width();
+      var height = target.height();
+      var clientX = touch.clientX;
+      var clientY = touch.clientY;
+
+      if( clientX < offset.left || clientX > width + offset.left ||
+        clientY < offset.top  || clientY > height + offset.top)
+        return;
+
+      var events = ["touchstart", "touchmove", "touchend"];
+      var mouseEvents = ["mousedown", "mousemove", "mouseup"];
+      var ev = events.indexOf(e.type);
+
+      if (ev === -1) return;
+
+      var type = mouseEvents[ev];
+      if (e.type === events[2] && lastTouchType === events[0]) {
+        type = "click";
+      }
+
+      var simulatedEvent = document.createEvent("MouseEvent");
+      simulatedEvent.initMouseEvent(type, true, true, window, 1,
+        touch.screenX, touch.screenY,
+        touch.clientX, touch.clientY, false,
+        false, false, false, 0, null);
+      touch.target.dispatchEvent(simulatedEvent);
+      e.preventDefault();
+      lastTouchType = e.type;
+    }
+
+    return {
+      touchHanlder: touchHandler,
+
+    }
+
+  })();
 
 
 
@@ -552,8 +602,19 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       cs.acsBallRadius = $$acsIndicator.width() / 2;
       cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
 
+
+      if (!scope.selectable) component.acsPanel.addClass('noselect');
+
+      if(scope.touch) touchable();
+
       setValue(scope.value || scope.min);
 
+    }
+
+    function touchable() {
+      angular.forEach(["touchstart", "touchmove", "touchend", "touchcancel"], function(type) {
+        element.on(type, eventHandlers.touchHandler);
+      });
     }
 
     function setValue(value) {
@@ -629,6 +690,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         bindings: ['innerCircleRatio', 'indicatorBallRatio', 'handleDistRatio'],
         transform: parseFloat,
       },
+      'boolean': {
+        bindings: ['touch', 'animate', 'selectable', 'clockwise'],
+        transform: function(o) { return o === 'true'; },
+      },
       'function': {
         bindings: ['onSlide'],
         transform: function(fun) {
@@ -651,7 +716,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         },
         'boolean': {
           bindings: ['touch', 'animate', 'selectable', 'clockwise'],
-          test: toBoolean,
+          test: truthy,
           onError: typeErrorMsg('boolean')
         },
         'function': {
