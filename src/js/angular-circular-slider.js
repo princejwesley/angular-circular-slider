@@ -72,14 +72,13 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
-
     function position() {
       var p = $$(offsetParent());
       var po = p.offset();
       var box = offset();
 
       po.top += parseToFloat(p.css('borderTopWidth'));
-      po.left += parseToFloat(p.css('borderLeftWidth')); 
+      po.left += parseToFloat(p.css('borderLeftWidth'));
 
       return {
         top: box.top - po.top - parseToFloat(elem.css('marginTop')),
@@ -106,7 +105,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       position: position,
     };
   }
-
 
   var cs = {};
 
@@ -181,7 +179,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -248,7 +246,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -316,7 +314,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -385,7 +383,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'right':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'right': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -453,7 +451,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'bottom': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left':(corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -484,9 +482,13 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     }
   };
 
-  var eventHandlers = (function(){
+  var eventHandlers = (function() {
+
+    var mouseDown = false;
+    var onAnimate = false;
     var lastTouchType = '';
-    function touchHandler(e) {
+
+    var touchHandler = function(e) {
       var touches = e.changedTouches;
 
       // Ignore multi-touch
@@ -495,7 +497,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var touch = touches[0];
       var target = $(touch.target);
 
-      if(!target.hasClass('jcs')) return;
+      if (!target.hasClass('jcs')) return;
 
       var offset = target.offset();
       var width = target.width();
@@ -503,8 +505,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var clientX = touch.clientX;
       var clientY = touch.clientY;
 
-      if( clientX < offset.left || clientX > width + offset.left ||
-        clientY < offset.top  || clientY > height + offset.top)
+      if (clientX < offset.left || clientX > width + offset.left ||
+        clientY < offset.top || clientY > height + offset.top)
         return;
 
       var events = ["touchstart", "touchmove", "touchend"];
@@ -526,16 +528,146 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       touch.target.dispatchEvent(simulatedEvent);
       e.preventDefault();
       lastTouchType = e.type;
-    }
+    };
+
+    var translate = function(e) {
+
+      var cursor = {
+        x: e.offsetX || e.originalEvent.layerX,
+        y: e.offsetY || e.originalEvent.layerY
+      };
+
+      var dx = cursor.x - cs.acsCenter.x;
+      var dy = cursor.y - cs.acsCenter.y;
+
+      var rad = Math.atan2(dy, dx);
+      var deg = rad * 180.0 / Math.PI;
+      var d360 = (parseInt(deg < 0 ? 360.0 + deg : deg)) % 360;
+
+      // change coordinate
+      var scope = cs.components.scope;
+      var offset = scope.borderWidth + cs.acsBallRadius;
+
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
+
+      var sd360 = (shapes[scope.shape].val2Deg(scope.value) + 360) % 360;
+
+      if (sd360 === d360) return;
+
+      var distance = Math.min((d360 + 360 - sd360) % 360, (sd360 + 360 - d360) % 360);
+      if (!distance) distance = 180;
+
+      var clockwise = ((d360 + 360 - sd360) % 360) === distance;
+      var r = scope.animateDuration / distance;
+      var delay = 4;
+      var unitDeg = 1;
+
+      if (r >= 4) {
+        delay = parseInt(r);
+      } else if (r >= 1) {
+        unitDeg = parseInt(r) * 4;
+      } else {
+        unitDeg = (4 / r);
+      }
+
+      //linear animation
+      // TODO: add easing effect
+      var next = sd360;
+      var count = parseInt(distance / unitDeg);
+
+      onAnimate = true;
+      var animate = function() {
+        next = next + (clockwise ? unitDeg : -unitDeg);
+        next = (next + 360) % 360;
+        if (--count <= 0) {
+          clearInterval(timer);
+          onAnimate = false;
+          next = d360;
+        }
+        scope.csSlider.setValue(shapes[scope.shape].deg2Val(next));
+        scope.$apply();
+      };
+      var timer = window.setInterval(animate, delay);
+    };
+
+    var mousemoveHanlder = function(e) {
+      e.stopPropagation();
+
+      if (!mouseDown || onAnimate) return;
+
+      var cursor = {
+        x: e.offsetX || e.originalEvent.layerX,
+        y: e.offsetY || e.originalEvent.layerY
+      };
+
+      var dx = cursor.x - cs.acsCenter.x;
+      var dy = cursor.y - cs.acsCenter.y;
+
+      var rad = Math.atan2(dy, dx);
+      var deg = rad * 180.0 / Math.PI;
+      var d360 = (parseInt(deg < 0 ? 360.0 + deg : deg)) % 360;
+      var scope = cs.components.scope;
+      var offset = scope.borderWidth + cs.acsBallRadius;
+
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
+
+      cs.components.acsIndicator.css('top', y + "px");
+      cs.components.acsIndicator.css('left', x + "px");
+
+      var d2v = shapes[scope.shape].deg2Val(d360);
+      var val = scope.clockwise ? d2v : (scope.max - d2v);
+
+      if (val < scope.min) val = scope.min;
+      else if (val > scope.max) val = scope.max;
+
+      scope.value = val;
+      scope.onSlide(val);
+      scope.$apply();
+    };
+
+    var mousedownHandler = function(e) {
+      mouseDown = true;
+      e.stopPropagation();
+    };
+
+    var mouseupHandler = function(e) {
+      mouseDown = false;
+      e.stopPropagation();
+    };
+
+    var clickHandler = function(e) {
+      e.stopPropagation();
+      var cursor = {
+        x: e.offsetX || e.originalEvent.layerX,
+        y: e.offsetY || e.originalEvent.layerY
+      };
+
+      var dx = cursor.x - cs.acsCenter.x;
+      var dy = cursor.y - cs.acsCenter.y;
+      var scope = cs.components.scope; 
+
+      var distance = Math.sqrt(dx * dx + dy * dy);
+      if (cs.acsRadius - distance <= cs.acsRadius * 0.1 || distance > cs.acsRadius) {
+        if (scope.animate) {
+          translate(e);
+        } else {
+          mouseDown = true;
+          mousemoveHanlder(e);
+        }
+      }
+      mouseDown = false;
+    };
 
     return {
-      touchHanlder: touchHandler,
-
-    }
-
+      touch: touchHandler,
+      mousemove: mousemoveHanlder,
+      mousedown: mousedownHandler,
+      mouseup: mouseupHandler,
+      click: clickHandler
+    };
   })();
-
-
 
   function circularSlider() {
     return {
@@ -584,7 +716,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
     // bind slider in scope
     scope.csSlider = {
-      'setValue' : setValue,
+      'setValue': setValue,
     };
 
     // private functions
@@ -602,10 +734,13 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       cs.acsBallRadius = $$acsIndicator.width() / 2;
       cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
 
-
       if (!scope.selectable) component.acsPanel.addClass('noselect');
 
-      if(scope.touch) touchable();
+      if (scope.touch) touchable();
+
+      angular.forEach(['mouseup', 'mousedown', 'mousemove', 'click'], function(type) {
+        element.on(type, eventHandlers[type]);
+      });
 
       setValue(scope.value || scope.min);
 
@@ -613,7 +748,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
     function touchable() {
       angular.forEach(["touchstart", "touchmove", "touchend", "touchcancel"], function(type) {
-        element.on(type, eventHandlers.touchHandler);
+        element.on(type, eventHandlers.touch);
       });
     }
 
@@ -626,12 +761,12 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var components = getComponents();
       var offset = components.scope.borderWidth + cs.acsBallRadius;
 
-      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset ;
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
       var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
-      
+
       components.acsIndicator.css('top', y + "px");
       components.acsIndicator.css('left', x + "px");
-      
+
       scope.value = value;
       scope.onSlide(value);
     }
@@ -670,7 +805,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     }
   }
 
-
   function CircularSliderController($scope) {
 
     function typeErrorMsg(typeName) {
@@ -692,7 +826,9 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       },
       'boolean': {
         bindings: ['touch', 'animate', 'selectable', 'clockwise'],
-        transform: function(o) { return o === 'true'; },
+        transform: function(o) {
+          return o === 'true';
+        },
       },
       'function': {
         bindings: ['onSlide'],
@@ -766,7 +902,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       }
     };
 
-
     this.validateBindings = function(property) {
       var props = property ? property : this.props,
         p, binding;
@@ -786,7 +921,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     };
 
     this.validateBinding = function(binding) {
-      if(angular.isUndefined(binding)) return;
+      if (angular.isUndefined(binding)) return;
       var property = {};
       property[binding] = this.props[binding];
       this.validateBindings(property);
@@ -817,11 +952,9 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       });
     }
 
-
     init(this.props = {});
 
   }
-
 
   CircularSliderController.$inject = ['$scope'];
 
