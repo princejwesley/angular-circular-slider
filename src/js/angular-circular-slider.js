@@ -118,7 +118,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       value: 0,
       radius: 75,
       innerCircleRatio: '0.5',
-      borderRatio: '0.1',
+      borderWidth: '1',
       indicatorBallRatio: '0.2',
       handleDistRatio: '1.0',
       clockwise: true,
@@ -152,7 +152,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-        var w = radius * scope.borderRatio;
+        var w = scope.borderWidth;
 
         acs.css({
           'width': rpx,
@@ -207,7 +207,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           throw "Invalid range " + value;
 
         var nth = value - scope.min;
-
         return (Math.round(nth * (360.0 / range)) - 90) % 360;
       },
     },
@@ -218,7 +217,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-        var w = radius * scope.borderRatio;
+        var w = scope.borderWidth;
 
         acs.css({
           'width': d + "px",
@@ -286,7 +285,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-        var w = radius * scope.borderRatio;
+        var w = scope.borderWidth;
 
         acs.css({
           'height': d + "px",
@@ -355,7 +354,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-        var w = radius * scope.borderRatio;
+        var w = scope.borderWidth;
 
         acs.css({
           'height': d + "px",
@@ -423,7 +422,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var acsValue = acsComponents.acsValue;
         var acsPanel = acsComponents.acsPanel;
         var scope = acsComponents.scope;
-        var w = radius * scope.borderRatio;
+        var w = scope.borderWidth;
 
         acs.css({
           'width': d + "px",
@@ -504,14 +503,14 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         innerCircleRatio: '@',
         indicatorBallRatio: '@',
         handleDistRatio: '@',
-        borderRatio: '@',
+        borderWidth: '@',
         clockwise: '@',
         shape: '@',
         touch: '@',
         animate: '@',
         animateDuration: '@',
         selectable: '@',
-        onSlide: '@',
+        onSlide: '&',
       },
       link: link,
     };
@@ -549,11 +548,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var $$acs = $$(component.acs);
       var $$acsIndicator = $$(component.acsIndicator);
       cs.acsPosition = $$acs.position();
-      cs.acsOuterArea = $$acs.outerWidth() - $$acs.width();
-      cs.acsBallOuterArea = $$acsIndicator.outerWidth() - $$acsIndicator.width();
-  
-      cs.acsRadius = ($$acs.width() + cs.acsOuterArea) / 2;
-      cs.acsBallRadius = ($$acsIndicator.width() + cs.acsBallOuterArea) / 2;
+      cs.acsRadius = $$acs.width() / 2;
+      cs.acsBallRadius = $$acsIndicator.width() / 2;
       cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
 
       setValue(scope.value || scope.min);
@@ -567,9 +563,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var d360 = shapes[scope.shape].val2Deg(val);
       var rad = d360 * Math.PI / 180;
       var components = getComponents();
+      var offset = components.scope.borderWidth + cs.acsBallRadius;
 
-      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - cs.acsBallRadius;
-      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - 2 * cs.acsBallRadius;
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset ;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
       
       components.acsIndicator.css('top', y + "px");
       components.acsIndicator.css('left', x + "px");
@@ -625,11 +622,11 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
     var transforms = {
       integer: {
-        bindings: ['min', 'max', 'value', 'radius', 'animateDuration'],
+        bindings: ['min', 'max', 'value', 'radius', 'animateDuration', 'borderWidth'],
         transform: parseInt
       },
       number: {
-        bindings: ['innerCircleRatio', 'borderRatio', 'indicatorBallRatio', 'handleDistRatio'],
+        bindings: ['innerCircleRatio', 'indicatorBallRatio', 'handleDistRatio'],
         transform: parseFloat,
       },
       'function': {
@@ -643,12 +640,12 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     var rules = {
       type: {
         integer: {
-          bindings: ['min', 'max', 'value', 'radius', 'animateDuration'],
+          bindings: ['min', 'max', 'value', 'radius', 'animateDuration', 'borderWidth'],
           test: toInteger,
           onError: typeErrorMsg('integer')
         },
         number: {
-          bindings: ['innerCircleRatio', 'borderRatio', 'indicatorBallRatio', 'handleDistRatio'],
+          bindings: ['innerCircleRatio', 'indicatorBallRatio', 'handleDistRatio'],
           test: Number.isFinite,
           onError: typeErrorMsg('number')
         },
@@ -693,7 +690,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           },
         },
         ratio: {
-          bindings: ['innerCircleRatio', 'handleDistRatio', 'borderRatio', 'indicatorBallRatio'],
+          bindings: ['innerCircleRatio', 'handleDistRatio', 'indicatorBallRatio'],
           test: function ratio(value) {
             return value >= 0.0 && value <= 1.0;
           },
