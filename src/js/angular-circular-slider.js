@@ -531,10 +531,9 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     };
 
     var translate = function(e) {
-
       var cursor = {
-        x: e.offsetX || e.originalEvent.layerX,
-        y: e.offsetY || e.originalEvent.layerY
+        x: e.offsetX || e.layerX,
+        y: e.offsetY || e.layerY
       };
 
       var dx = cursor.x - cs.acsCenter.x;
@@ -597,8 +596,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       if (!mouseDown || onAnimate) return;
 
       var cursor = {
-        x: e.offsetX || e.originalEvent.layerX,
-        y: e.offsetY || e.originalEvent.layerY
+        x: e.offsetX || e.layerX,
+        y: e.offsetY || e.layerY
       };
 
       var dx = cursor.x - cs.acsCenter.x;
@@ -640,8 +639,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     var clickHandler = function(e) {
       e.stopPropagation();
       var cursor = {
-        x: e.offsetX || e.originalEvent.layerX,
-        y: e.offsetY || e.originalEvent.layerY
+        x: e.offsetX || e.layerX,
+        y: e.offsetY || e.layerY
       };
 
       var dx = cursor.x - cs.acsCenter.x;
@@ -678,20 +677,20 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       controllerAs: 'slider',
       scope: {
         csSlider: '=?',
-        min: '@',
-        max: '@',
+        min: '=?',
+        max: '=?',
         value: '=?',
-        radius: '@',
-        innerCircleRatio: '@',
-        indicatorBallRatio: '@',
-        handleDistRatio: '@',
-        borderWidth: '@',
-        clockwise: '@',
+        radius: '=?',
+        innerCircleRatio: '=?',
+        indicatorBallRatio: '=?',
+        handleDistRatio: '=?',
+        borderWidth: '=?',
+        clockwise: '=?',
         shape: '@',
-        touch: '@',
-        animate: '@',
-        animateDuration: '@',
-        selectable: '@',
+        touch: '=?',
+        animate: '=?',
+        animateDuration: '=?',
+        selectable: '=?',
         onSlide: '&',
       },
       link: link,
@@ -827,7 +826,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       'boolean': {
         bindings: ['touch', 'animate', 'selectable', 'clockwise'],
         transform: function(o) {
-          return o === 'true';
+          return o === 'true' || o === true;
         },
       },
       'function': {
