@@ -126,6 +126,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       animateDuration: 360,
       selectable: false,
       onSlide: angular.noop,
+      onSlideEnd: angular.noop,
 
     },
 
@@ -586,9 +587,17 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         }
         scope.csSlider.setValue(shapes[scope.shape].deg2Val(next));
         scope.$apply();
+        if(!onAnimate) onSlideEnd();
       };
       var timer = window.setInterval(animate, delay);
     };
+
+    function onSlideEnd() {
+      var scope = cs.components.scope;
+      console.log(scope.value)
+      if(typeof scope.onSlideEnd === 'function')
+        scope.onSlideEnd(scope.value);
+    }
 
     var mousemoveHanlder = function(e) {
       e.stopPropagation();
@@ -654,8 +663,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         } else {
           mouseDown = true;
           mousemoveHanlder(e);
+          onSlideEnd();
         }
-      }
+      } else onSlideEnd();
+
       mouseDown = false;
     };
 
@@ -692,6 +703,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         animateDuration: '=?',
         selectable: '=?',
         onSlide: '&',
+        onSlideEnd: '&',
       },
       link: link,
     };
@@ -767,7 +779,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       components.acsIndicator.css('left', x + "px");
 
       scope.value = value;
-      scope.onSlide(value);
+      if(typeof scope.onSlide === 'function')
+        scope.onSlide(value);
     }
 
     function drawIndicatorBall(component, radius) {
@@ -830,7 +843,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         },
       },
       'function': {
-        bindings: ['onSlide'],
+        bindings: ['onSlide', 'onSlideEnd'],
         transform: function(fun) {
           return fun ? fun : angular.noop;
         },
@@ -855,7 +868,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onError: typeErrorMsg('boolean')
         },
         'function': {
-          bindings: ['onSlide'],
+          bindings: ['onSlide', 'onSlideEnd'],
           test: angular.isFunction,
           onError: typeErrorMsg('function')
         },
