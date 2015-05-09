@@ -115,10 +115,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       max: 359,
       value: 0,
       radius: 75,
-      innerCircleRatio: '0.5',
-      borderWidth: '1',
-      indicatorBallRatio: '0.2',
-      handleDistRatio: '1.0',
+      innerCircleRatio: 0.5,
+      borderWidth: 1,
+      indicatorBallRatio: 0.2,
+      handleDistRatio: 1.0,
       clockwise: true,
       shape: "Circle",
       touch: true,
@@ -127,7 +127,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       selectable: false,
       onSlide: angular.noop,
       onSlideEnd: angular.noop,
-
     },
 
     template: '\
@@ -593,7 +592,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onAnimate = false;
           next = d360;
         }
-        scope.$$csSlider.setValue(shapes[scope.shape].deg2Val(next));
+        cs.funs.setValue(shapes[scope.shape].deg2Val(next));
         scope.$apply();
         if (!onAnimate) onSlideEnd();
       };
@@ -639,7 +638,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       if (val < scope.min) val = scope.min;
       else if (val > scope.max) val = scope.max;
 
-      scope.value = val;
+      scope.value = scope.$$value = val;
       scope.onSlide(val);
       scope.$apply();
     };
@@ -705,7 +704,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         handleDistRatio: '=?',
         borderWidth: '=?',
         clockwise: '=?',
-        shape: '@',
+        shape: '@?',
         touch: '=?',
         animate: '=?',
         animateDuration: '=?',
@@ -717,6 +716,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     };
 
     function link(scope, element, attr, controller, transcludeFn) {
+      
+      if(angular.isUndefined(scope.value))
+        scope.value = scope.min;
+      
       angular.forEach(scope.$$isolateBindings, function(binding, key) {
         if (angular.isUndefined(scope[key])) {
           scope[key] = props.defaults[key];
@@ -728,17 +731,28 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
       // building components
       element.addClass('acs-slider');
+      // draw & wiring events
       redrawShape();
 
-      // wiring events
-
-      // bind slider in scope
-      scope.$$csSlider = {
+      cs.funs = {
         'setValue': setValue,
       };
 
+      // assign cs scope as transclude elements scope
       transcludeFn(scope, function (clone) {
         angular.element(element[0].getElementsByClassName('acs-value')).empty().append(clone);
+      });
+
+      // watchers
+      scope.$watch('value', function(v) {
+        if(v !== scope.$$value) {
+          try {
+            cs.funs.setValue(v);
+          } catch(e) {
+            scope.value = scope.$$value;
+            throw e;
+          }
+        }
       });
 
       // private functions
@@ -757,6 +771,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
 
         if (!scope.selectable) component.acsPanel.addClass('noselect');
+        else component.acsPanel.removeClass('noselect');
 
         if (scope.touch) touchable();
 
@@ -765,7 +780,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         });
 
         setValue(scope.value || scope.min);
-
       }
 
       function touchable() {
@@ -792,7 +806,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         components.acsIndicator.css('top', y + "px");
         components.acsIndicator.css('left', x + "px");
 
-        scope.value = value;
+        scope.value = scope.$$value = value;
         if (typeof scope.onSlide === 'function')
           scope.onSlide(value);
       }
@@ -984,7 +998,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     }
 
     init(this.props = {});
-
   }
 
   CircularSliderController.$inject = ['$scope'];
