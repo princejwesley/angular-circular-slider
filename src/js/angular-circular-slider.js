@@ -180,7 +180,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) +
+            "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -247,7 +248,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) +
+            "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -315,7 +317,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) +
+            "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -384,7 +387,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var corner = radius - iRadius;
         acsValue.css({
           'top': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'right': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'right': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) +
+            "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -451,8 +455,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
         var corner = radius - iRadius;
         acsValue.css({
-          'bottom': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) + "px",
-          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) + "px",
+          'bottom': (corner - $$acs.prop('clientTop') - $$acsValue.prop('clientTop')) +
+            "px",
+          'left': (corner - $$acs.prop('clientLeft') - $$acsValue.prop('clientLeft')) +
+            "px",
         });
       },
       getCenter: function(acsPosition, acsRadius) {
@@ -548,8 +554,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var scope = cs.components.scope;
       var offset = scope.borderWidth + cs.acsBallRadius;
 
-      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
-      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) -
+        offset;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) -
+        offset;
 
       var sd360 = (shapes[scope.shape].val2Deg(scope.value) + 360) % 360;
 
@@ -585,17 +593,16 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onAnimate = false;
           next = d360;
         }
-        scope.csSlider.setValue(shapes[scope.shape].deg2Val(next));
+        scope.$$csSlider.setValue(shapes[scope.shape].deg2Val(next));
         scope.$apply();
-        if(!onAnimate) onSlideEnd();
+        if (!onAnimate) onSlideEnd();
       };
       var timer = window.setInterval(animate, delay);
     };
 
     function onSlideEnd() {
       var scope = cs.components.scope;
-      console.log(scope.value)
-      if(typeof scope.onSlideEnd === 'function')
+      if (typeof scope.onSlideEnd === 'function')
         scope.onSlideEnd(scope.value);
     }
 
@@ -618,8 +625,10 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       var scope = cs.components.scope;
       var offset = scope.borderWidth + cs.acsBallRadius;
 
-      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
-      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
+      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) -
+        offset;
+      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) -
+        offset;
 
       cs.components.acsIndicator.css('top', y + "px");
       cs.components.acsIndicator.css('left', x + "px");
@@ -654,7 +663,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
       var dx = cursor.x - cs.acsCenter.x;
       var dy = cursor.y - cs.acsCenter.y;
-      var scope = cs.components.scope; 
+      var scope = cs.components.scope;
 
       var distance = Math.sqrt(dx * dx + dy * dy);
       if (cs.acsRadius - distance <= cs.acsRadius * 0.1 || distance > cs.acsRadius) {
@@ -687,7 +696,6 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       controller: CircularSliderController,
       controllerAs: 'slider',
       scope: {
-        csSlider: '=?',
         min: '=?',
         max: '=?',
         value: '=?',
@@ -707,113 +715,120 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       },
       link: link,
     };
-  }
 
-  function link(scope, element, attr, controller) {
-    angular.forEach(scope.$$isolateBindings, function(binding, key) {
-      if (angular.isUndefined(scope[key])) {
-        scope[key] = props.defaults[key];
+    function link(scope, element, attr, controller, transcludeFn) {
+      angular.forEach(scope.$$isolateBindings, function(binding, key) {
+        if (angular.isUndefined(scope[key])) {
+          scope[key] = props.defaults[key];
+        }
+      });
+
+      // validations
+      controller.validateBindings();
+
+      // building components
+      element.addClass('acs-slider');
+      redrawShape();
+
+      // wiring events
+
+      // bind slider in scope
+      scope.$$csSlider = {
+        'setValue': setValue,
+      };
+
+      transcludeFn(scope, function (clone) {
+        angular.element(element[0].getElementsByClassName('acs-value')).empty().append(clone);
+      });
+
+      // private functions
+
+      function redrawShape() {
+        var component = getComponents();
+        var radius = getRadius();
+        shapes[scope.shape].drawShape(component, radius);
+        drawIndicatorBall(component, radius);
+
+        var $$acs = $$(component.acs);
+        var $$acsIndicator = $$(component.acsIndicator);
+        cs.acsPosition = $$acs.position();
+        cs.acsRadius = $$acs.width() / 2;
+        cs.acsBallRadius = $$acsIndicator.width() / 2;
+        cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
+
+        if (!scope.selectable) component.acsPanel.addClass('noselect');
+
+        if (scope.touch) touchable();
+
+        angular.forEach(['mouseup', 'mousedown', 'mousemove', 'click'], function(type) {
+          element.on(type, eventHandlers[type]);
+        });
+
+        setValue(scope.value || scope.min);
+
       }
-    });
 
-    // validations
-    controller.validateBindings();
-
-    // building components
-    element.addClass('acs-slider');
-    redrawShape();
-
-    // wiring events
-
-    // bind slider in scope
-    scope.csSlider = {
-      'setValue': setValue,
-    };
-
-    // private functions
-
-    function redrawShape() {
-      var component = getComponents();
-      var radius = getRadius();
-      shapes[scope.shape].drawShape(component, radius);
-      drawIndicatorBall(component, radius);
-
-      var $$acs = $$(component.acs);
-      var $$acsIndicator = $$(component.acsIndicator);
-      cs.acsPosition = $$acs.position();
-      cs.acsRadius = $$acs.width() / 2;
-      cs.acsBallRadius = $$acsIndicator.width() / 2;
-      cs.acsCenter = shapes[scope.shape].getCenter(cs.acsPosition, cs.acsRadius);
-
-      if (!scope.selectable) component.acsPanel.addClass('noselect');
-
-      if (scope.touch) touchable();
-
-      angular.forEach(['mouseup', 'mousedown', 'mousemove', 'click'], function(type) {
-        element.on(type, eventHandlers[type]);
-      });
-
-      setValue(scope.value || scope.min);
-
-    }
-
-    function touchable() {
-      angular.forEach(["touchstart", "touchmove", "touchend", "touchcancel"], function(type) {
-        element.on(type, eventHandlers.touch);
-      });
-    }
-
-    function setValue(value) {
-      controller.validateBinding('value');
-
-      var val = scope.clockwise ? value : (scope.max - value);
-      var d360 = shapes[scope.shape].val2Deg(val);
-      var rad = d360 * Math.PI / 180;
-      var components = getComponents();
-      var offset = components.scope.borderWidth + cs.acsBallRadius;
-
-      var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) - offset;
-      var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) - offset;
-
-      components.acsIndicator.css('top', y + "px");
-      components.acsIndicator.css('left', x + "px");
-
-      scope.value = value;
-      if(typeof scope.onSlide === 'function')
-        scope.onSlide(value);
-    }
-
-    function drawIndicatorBall(component, radius) {
-      component.acsIndicator.css({
-        'width': (radius * scope.indicatorBallRatio) + "px",
-        'height': (radius * scope.indicatorBallRatio) + "px",
-      });
-    };
-
-    function getComponents() {
-      return cs.components ? cs.components : buildComponents();
-
-      function buildComponents() {
-        var acsPanel = element.children();
-        var acsPanelChildren = acsPanel.children();
-        var acs = angular.element(acsPanelChildren[0]);
-        var acsIndicator = angular.element(acsPanelChildren[1]);
-        var acsValue = acs.children();
-
-        var acsComponents = {
-          'acsPanel': acsPanel,
-          'acs': acs,
-          'acsIndicator': acsIndicator,
-          'acsValue': acsValue,
-          'scope': scope,
-          'ctrl': controller,
-        };
-        return (cs.components = acsComponents);
+      function touchable() {
+        angular.forEach(["touchstart", "touchmove", "touchend", "touchcancel"], function(
+          type) {
+          element.on(type, eventHandlers.touch);
+        });
       }
-    }
 
-    function getRadius() {
-      return Math.abs(parseInt(scope.radius)) || props.defaults.radius;
+      function setValue(value) {
+        controller.validateBinding('value');
+
+        var val = scope.clockwise ? value : (scope.max - value);
+        var d360 = shapes[scope.shape].val2Deg(val);
+        var rad = d360 * Math.PI / 180;
+        var components = getComponents();
+        var offset = components.scope.borderWidth + cs.acsBallRadius;
+
+        var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) -
+          offset;
+        var y = cs.acsCenter.y + (cs.acsCenter.r * scope.handleDistRatio * Math.sin(rad)) -
+          offset;
+
+        components.acsIndicator.css('top', y + "px");
+        components.acsIndicator.css('left', x + "px");
+
+        scope.value = value;
+        if (typeof scope.onSlide === 'function')
+          scope.onSlide(value);
+      }
+
+      function drawIndicatorBall(component, radius) {
+        component.acsIndicator.css({
+          'width': (radius * scope.indicatorBallRatio) + "px",
+          'height': (radius * scope.indicatorBallRatio) + "px",
+        });
+      };
+
+      function getComponents() {
+        return cs.components ? cs.components : buildComponents();
+
+        function buildComponents() {
+          var acsPanel = element.children();
+          var acsPanelChildren = acsPanel.children();
+          var acs = angular.element(acsPanelChildren[0]);
+          var acsIndicator = angular.element(acsPanelChildren[1]);
+          var acsValue = acs.children();
+
+          var acsComponents = {
+            'acsPanel': acsPanel,
+            'acs': acs,
+            'acsIndicator': acsIndicator,
+            'acsValue': acsValue,
+            'scope': scope,
+            'ctrl': controller,
+          };
+          return (cs.components = acsComponents);
+        }
+      }
+
+      function getRadius() {
+        return Math.abs(parseInt(scope.radius)) || props.defaults.radius;
+      }
     }
   }
 
@@ -825,7 +840,9 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       };
     }
 
-    var shapes = ['Circle', 'Half Circle', 'Half Circle Left', 'Half Circle Right', 'Half Circle Bottom'];
+    var shapes = ['Circle', 'Half Circle', 'Half Circle Left', 'Half Circle Right',
+      'Half Circle Bottom'
+    ];
 
     var transforms = {
       integer: {
@@ -890,7 +907,9 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
             return $scope.min <= value && value <= $scope.max;
           },
           onError: function() {
-            return [$scope.value, '(value) out of range: [', $scope.min, ',', $scope.max, ']'].join('');
+            return [$scope.value, '(value) out of range: [', $scope.min, ',', $scope.max,
+              ']'
+            ].join('');
           },
         },
         shape: {
