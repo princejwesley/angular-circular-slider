@@ -58,12 +58,6 @@ var app = angular.module('yourApp',
 #### clockwise
 > direction of the sliding value.
 
-#### labelSuffix
-> label to be used as suffix along with current sliding `value`.
-
-#### labelPrefix
-> label to be used as prefix along with current sliding `value`.
-
 #### shape
 > `shape` of the slider. Supported shapes are:
 
@@ -130,6 +124,33 @@ defaults: {
 },
 ```
 
+### Scope bindings
+```javascript
+scope: {
+  min: '=?',
+  max: '=?',
+  value: '=?',
+  radius: '=?',
+  innerCircleRatio: '=?',
+  indicatorBallRatio: '=?',
+  handleDistRatio: '=?',
+  borderWidth: '=?',
+  clockwise: '=?',
+  shape: '@?',
+  touch: '=?',
+  animate: '=?',
+  animateDuration: '=?',
+  selectable: '=?',
+  onSlide: '&',
+  onSlideEnd: '&',
+},
+```
+### Watchers
+```javascript
+scope: {
+  value: '=?'
+}
+```
 #### CSS classes
 Use the below css classes for customization
 > `.acs-panel` - circular slider panel
