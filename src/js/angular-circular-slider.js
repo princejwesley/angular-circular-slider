@@ -125,6 +125,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       animate: true,
       animateDuration: 360,
       selectable: false,
+      disabled: false,
       onSlide: angular.noop,
       onSlideEnd: angular.noop,
     },
@@ -644,16 +645,22 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     };
 
     var mousedownHandler = function(e) {
+      if(cs.components.scope.disabled)
+        return;
       mouseDown = true;
       e.stopPropagation();
     };
 
     var mouseupHandler = function(e) {
+      if(cs.components.scope.disabled)
+        return;
       mouseDown = false;
       e.stopPropagation();
     };
 
     var clickHandler = function(e) {
+      if(cs.components.scope.disabled)
+        return;
       e.stopPropagation();
       var cursor = {
         x: e.offsetX || e.layerX,
@@ -709,6 +716,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         animate: '=?',
         animateDuration: '=?',
         selectable: '=?',
+        disabled: '=?',
         onSlide: '&',
         onSlideEnd: '&',
       },
@@ -745,6 +753,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
       // watchers
       scope.$watch('value', function(v) {
+        if(cs.components.scope.disabled)
+          return;
         if(v !== scope.$$value) {
           try {
             cs.funs.setValue(v);
@@ -868,7 +878,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         transform: parseFloat,
       },
       'boolean': {
-        bindings: ['touch', 'animate', 'selectable', 'clockwise'],
+        bindings: ['touch', 'animate', 'selectable', 'clockwise', 'disabled'],
         transform: function(o) {
           return o === 'true' || o === true;
         },
@@ -894,7 +904,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           onError: typeErrorMsg('number')
         },
         'boolean': {
-          bindings: ['touch', 'animate', 'selectable', 'clockwise'],
+          bindings: ['touch', 'animate', 'selectable', 'clockwise', 'disabled'],
           test: truthy,
           onError: typeErrorMsg('boolean')
         },

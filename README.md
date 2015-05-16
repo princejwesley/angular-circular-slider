@@ -79,6 +79,9 @@ var app = angular.module('yourApp',
 ### selectable
 > text selection enabled or not. (default: *false*)
 
+### disabled
+> slider is disabled or not. (default: *false*)
+
 ### handleDistRatio
 > Distance between handle and shape center(default: 1.0)
 
@@ -119,6 +122,7 @@ defaults: {
   animate: true,
   animateDuration: 360,
   selectable: false,
+  disabled: false,
   onSlide: angular.noop,
   onSlideEnd: angular.noop,
 },
@@ -141,6 +145,7 @@ scope: {
   animate: '=?',
   animateDuration: '=?',
   selectable: '=?',
+  disabled: '=?'
   onSlide: '&',
   onSlideEnd: '&',
 },
@@ -148,7 +153,8 @@ scope: {
 ### Watchers
 ```javascript
 scope: {
-  value: '=?'
+  value: '=?',
+  disabled: '=?'
 }
 ```
 #### CSS classes
