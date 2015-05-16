@@ -502,13 +502,14 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       if (touches.length > 1) return;
 
       var touch = touches[0];
-      var target = $(touch.target);
+      var target = angular.element(touch.target);
 
-      if (!target.hasClass('jcs')) return;
+      if (!target.hasClass('acs')) return;
 
-      var offset = target.offset();
-      var width = target.width();
-      var height = target.height();
+      var $$target = $$(target);
+      var offset = $$target.offset();
+      var width = $$target.width();
+      var height = $$target.height();
       var clientX = touch.clientX;
       var clientY = touch.clientY;
 
