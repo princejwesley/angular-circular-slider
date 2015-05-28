@@ -517,8 +517,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         clientY < offset.top || clientY > height + offset.top)
         return;
 
-      var events = ["touchstart", "touchmove", "touchend"];
-      var mouseEvents = ["mousedown", "mousemove", "mouseup"];
+      var events = ["touchstart", "touchmove", "touchend", "touchcancel"];
+      var mouseEvents = ["mousedown", "mousemove", "mouseup", "mouseleave"];
       var ev = events.indexOf(e.type);
 
       if (ev === -1) return;
@@ -691,6 +691,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       mousemove: mousemoveHanlder,
       mousedown: mousedownHandler,
       mouseup: mouseupHandler,
+      mouseleave: mouseupHandler,
       click: clickHandler
     };
   })();
@@ -786,7 +787,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
         if (scope.touch) touchable();
 
-        angular.forEach(['mouseup', 'mousedown', 'mousemove', 'click'], function(type) {
+        angular.forEach(['mouseup', 'mousedown', 'mousemove', 'mouseleave', 'click'], function(type) {
           element.on(type, eventHandlers[type]);
         });
 
@@ -901,7 +902,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         },
         number: {
           bindings: ['innerCircleRatio', 'indicatorBallRatio', 'handleDistRatio'],
-          test: Number.isFinite,
+          test: isFinite,
           onError: typeErrorMsg('number')
         },
         'boolean': {
