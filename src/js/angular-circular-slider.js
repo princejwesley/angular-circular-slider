@@ -770,7 +770,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       // private functions
 
       function redrawShape() {
-        var component = getComponents();
+        var component = buildComponents();
         var radius = getRadius();
         shapes[scope.shape].drawShape(component, radius);
         drawIndicatorBall(component, radius);
@@ -807,7 +807,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         var val = scope.clockwise ? value : (scope.max - value);
         var d360 = shapes[scope.shape].val2Deg(val);
         var rad = d360 * Math.PI / 180;
-        var components = getComponents();
+        var components = buildComponents();
         var offset = components.scope.borderWidth + cs.acsBallRadius;
 
         var x = cs.acsCenter.x + (cs.acsCenter.r * scope.handleDistRatio * Math.cos(rad)) -
@@ -830,27 +830,23 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         });
       };
 
-      function getComponents() {
-        return cs.components ? cs.components : buildComponents();
+    function buildComponents() {
+		var acsPanel = element.children();
+        var acsPanelChildren = acsPanel.children();
+        var acs = angular.element(acsPanelChildren[0]);
+        var acsIndicator = angular.element(acsPanelChildren[1]);
+        var acsValue = acs.children();
 
-        function buildComponents() {
-          var acsPanel = element.children();
-          var acsPanelChildren = acsPanel.children();
-          var acs = angular.element(acsPanelChildren[0]);
-          var acsIndicator = angular.element(acsPanelChildren[1]);
-          var acsValue = acs.children();
-
-          var acsComponents = {
-            'acsPanel': acsPanel,
-            'acs': acs,
-            'acsIndicator': acsIndicator,
-            'acsValue': acsValue,
-            'scope': scope,
-            'ctrl': controller,
-          };
-          return (cs.components = acsComponents);
-        }
-      }
+        var acsComponents = {
+          'acsPanel': acsPanel,
+          'acs': acs,
+          'acsIndicator': acsIndicator,
+          'acsValue': acsValue,
+          'scope': scope,
+          'ctrl': controller,
+        };
+        return (cs.components = acsComponents);
+    }
 
       function getRadius() {
         return Math.abs(parseInt(scope.radius)) || props.defaults.radius;
