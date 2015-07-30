@@ -604,7 +604,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
     function onSlideEnd() {
       var scope = cs.components.scope;
       if (typeof scope.onSlideEnd === 'function')
-        scope.onSlideEnd(scope.value);
+        scope.onSlideEnd();
     }
 
     var mousemoveHanlder = function(e) {
@@ -641,7 +641,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
       else if (val > scope.max) val = scope.max;
 
       scope.value = scope.$$value = val;
-      scope.onSlide(val);
+      scope.onSlide();
       scope.$apply();
     };
 
@@ -820,7 +820,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
 
         scope.value = scope.$$value = value;
         if (typeof scope.onSlide === 'function')
-          scope.onSlide(value);
+          scope.onSlide();
       }
 
       function drawIndicatorBall(component, radius) {
