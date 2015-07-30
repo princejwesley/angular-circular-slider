@@ -9,6 +9,7 @@
 
 	<body ng-controller="test">
 	<script> 
+
     var app = angular.module('test-cs', ['angular.circular-slider']);
     app.controller('test', function ($scope) {
     	$scope.min = 10;
@@ -16,18 +17,18 @@
     	$scope.shape='Circle';
     	$scope.value = 20;
 
-			$scope.onSlide = function(value) {
+			$scope.onSlide = function onSlide (value) {
 				console.log('on slide  ' + value);
 			}
 		
-			$scope.onSlideEnd = function(value) {
+			$scope.onSlideEnd = function onSlideEnd(value) {
 				console.log('on slide end  ' + value);
 			}
     });
 	</script>
 
 	<h2> circular slider directive </h2>
-	<circular-slider class='my-slider' shape='{{shape}}' touch="true" animate='true' on-slide='onSlide(value)' on-slide-end='onSlideEnd(value)' min="min" max="200" value="value">
+	<circular-slider class='my-slider' shape='{{shape}}' touch="true" animate='true' on-slide='onSlide' on-slide-end='onSlideEnd' min="min" max="200" value="value">
 		{{value}}
 	</circular-slider>
 	</body>

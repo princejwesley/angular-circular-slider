@@ -26,8 +26,8 @@ var app = angular.module('yourApp',
   shape='{{shape}}'
   touch="true"
   animate='true'
-  on-slide='onSlide(value)'
-  on-slide-end='onSlideEnd(value)'
+  on-slide='onSlide'
+  on-slide-end='onSlideEnd'
   min="min"
   max="200"
   value="value">
@@ -146,8 +146,8 @@ scope: {
   animateDuration: '=?',
   selectable: '=?',
   disabled: '=?'
-  onSlide: '&',
-  onSlideEnd: '&',
+  onSlide: '=',
+  onSlideEnd: '=',
 },
 ```
 ### Watchers

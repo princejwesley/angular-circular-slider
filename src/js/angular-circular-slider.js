@@ -719,8 +719,8 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
         animateDuration: '=?',
         selectable: '=?',
         disabled: '=?',
-        onSlide: '&',
-        onSlideEnd: '&',
+        onSlide: '=',
+        onSlideEnd: '=',
       },
       link: link,
     };
