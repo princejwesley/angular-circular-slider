@@ -1,11 +1,11 @@
 {
   "name": "angular-circular-slider",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "homepage": "https://github.com/princejwesley/angular-circular-slider",
   "authors": [
     "princejwesley <princejohnwesley@gmail.com>"
   ],
-  "main" : [
+  "main": [
     "dist/js/angular-circular-slider.min.js",
     "dist/css/angular-circular-slider.min.css"
   ],
@@ -13,9 +13,9 @@
   "ignore": [
     "!(dist)"
   ],
-  "description" : "Angular circular slider",
+  "description": "Angular circular slider",
   "dependencies": {
-	"angular": "~1.3.5"
+    "angular": "~1.3.5"
   },
   "keywords": [
     "angular",
