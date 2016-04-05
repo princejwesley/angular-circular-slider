@@ -791,7 +791,7 @@ Copyright (c) 2015 Prince John Wesley (princejohnwesley@gmail.com)
           element.on(type, eventHandlers[type]);
         });
 
-        setValue(scope.value || scope.min);
+        setValue(typeof scope.value === 'number' ? scope.value : scope.min);
       }
 
       function touchable() {
