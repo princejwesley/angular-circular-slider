@@ -15,7 +15,7 @@
   ],
   "description": "Angular circular slider",
   "dependencies": {
-    "angular": "~1.3.5"
+    "angular": ">=1.3.5 < 1.7"
   },
   "keywords": [
     "angular",
